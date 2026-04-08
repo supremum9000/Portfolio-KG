@@ -676,7 +676,7 @@ export const portfolioCases = {
       title: 'Инженердик долбоорлорду башкаруу',
       company: 'Mosinzhproekt',
       role: 'Жетектөөчү адис',
-      contextLine: 'Mosinzhproekt · Системдик анализ · Курулуш',
+      contextLine: 'Mosinzhproekt · Системдик талдоо · Курулуш',
       summary:
         'Инженердик долбоорлорду башкаруу маалымат системасы үчүн максаттуу бизнес-архитектураны жана талаптарды иштеп чыктым. Системанын негизги блоктору: келишимдерди жана долбоордун чыгашаларын башкаруу, БДР/БДДС бюджеттештирүү, долбоорлор портфелин башкаруу, инженердик маалыматтар жана документтерди чыгарууну контролдоо, ресурстарды башкаруу, календардык-тармак графиктери жана Oracle Primavera интеграциясы.',
       preparedArtifacts: [
@@ -771,7 +771,7 @@ export const portfolioCases = {
       title: 'Инженердик маалыматтарды башкаруу жана инженердик документ жүгүртүү',
       company: 'Enter Engineering Russia',
       role: 'Системдик аналитик',
-      contextLine: 'Enter Engineering Russia · Системдик анализ · Курулуш',
+      contextLine: 'Enter Engineering Russia · Системдик талдоо · Курулуш',
       summary:
         'Intergraph Hexagon негизинде өнөр жай курулушунда инженердик маалыматтарды башкаруу жана инженердик документ жүгүртүү үчүн талаптарды жана техникалык долбоордун артефакттарын даярдадым.',
       preparedArtifacts: [
@@ -791,14 +791,14 @@ export const portfolioCases = {
       title: 'Сатып алууларды жана жеткирүү чынжырын башкаруу',
       company: 'Enter Engineering Russia',
       role: 'Системдик аналитик',
-      contextLine: 'Enter Engineering Russia · Системдик анализ · Курулуш',
+      contextLine: 'Enter Engineering Russia · Системдик талдоо · Курулуш',
       summary:
         'Smart Materials, Smart Reference Data жана 1C ERP USO негизинде өнөр жай курулушу үчүн сатып алуулар, логистика, жеткирүү чынжыры жана курулушту эксплуатацияга тапшыруу процесстери боюнча талаптарды жана техникалык долбоордун артефакттарын даярдадым.',
       preparedArtifacts: [
         'Сатып алууларды жана логистиканы башкаруу талаптары.',
         'Курулуш иштерин аткаруу жана эксплуатацияга тапшыруу талаптары.',
         'Ченемдик-маалыматтык маалыматты башкаруу талаптары.',
-        'Smart Materials, Smart Reference Data жана 1C ERP USO ну камтыган системалык ландшафттын сүрөттөмөсү.'
+        'Smart Materials, Smart Reference Data жана 1C ERP USOну камтыган системалык ландшафттын сүрөттөмөсү.'
       ],
       technologies: ['Intergraph Hexagon', 'Smart Materials', 'Smart Reference Data', 'REST', 'SOAP', '1C ERP USO', 'Oracle DB'],
       outcome: [
