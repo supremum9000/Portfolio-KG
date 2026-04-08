@@ -46,8 +46,8 @@ function AboutPage() {
                   <div className="flex items-center gap-2">
                     <Mail className="h-5 w-5 text-primary" />
                     <span className="text-muted-foreground">{content.facts.emailLabel}:</span>
-                    <a href="mailto:supremum7000@proton.me" className="text-primary hover:underline">
-                      supremum7000@proton.me
+                    <a href="mailto:supremum9000@gmail.com" className="text-primary hover:underline">
+                      supremum9000@gmail.com
                     </a>
                   </div>
                   <div className="flex items-center gap-2">

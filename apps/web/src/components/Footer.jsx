@@ -15,7 +15,7 @@ function Footer() {
 
           <div className="flex items-center gap-6">
             <a
-              href="mailto:supremum7000@proton.me"
+              href="mailto:supremum9000@gmail.com"
               className="text-muted-foreground transition-colors duration-200 hover:text-primary"
               aria-label={ui.footer.email}
             >
@@ -39,10 +39,10 @@ function Footer() {
 
           <div className="text-sm">
             <a
-              href="mailto:supremum7000@proton.me"
+              href="mailto:supremum9000@gmail.com"
               className="transition-colors duration-200 hover:text-primary"
             >
-              supremum7000@proton.me
+              supremum9000@gmail.com
             </a>
           </div>
         </div>
