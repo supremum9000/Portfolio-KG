@@ -21,6 +21,7 @@ export default {
   footer: {
     rightsReserved: 'Все права защищены.',
     email: 'Email',
+    telegram: 'Telegram',
     linkedin: 'LinkedIn',
     github: 'GitHub'
   }
