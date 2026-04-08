@@ -203,7 +203,7 @@ export const skillsContent = {
         ]
       },
       {
-        name: 'Долбоор иштери',
+        name: 'Долбоордук иштер',
         skills: [
           'PMBOK',
           'Agile',

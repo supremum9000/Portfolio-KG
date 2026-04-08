@@ -101,7 +101,7 @@ export const contactContent = {
       errors: {
         nameRequired: 'Аты-жөнү киргизилиши керек',
         emailRequired: 'Email киргизилиши керек',
-        emailInvalid: 'Сураныч, туура email дарегин киргизиңиз',
+        emailInvalid: 'Туура email дарек киргизилиши керек',
         messageRequired: 'Кабар киргизилиши керек',
         messageMin: 'Кабар кеминде 10 белгиден турушу керек'
       }
