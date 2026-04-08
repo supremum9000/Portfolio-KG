@@ -182,7 +182,7 @@ export const skillsContent = {
           'ArchiMate',
           'Sparx Enterprise Architect',
           'Domain-Driven Design',
-          'Интеграция архитектурасы',
+          'Интеграциялык архитектура',
           'API долбоорлоо'
         ]
       },
@@ -224,7 +224,7 @@ export const skillsContent = {
           'BPM CBOK',
           'Бухгалтердик эсеп',
           'Чыгымдарды башкаруу',
-          'Техникалык документация',
+          'Техникалык документтештирүү',
           'Командаларды окутуу'
         ]
       }

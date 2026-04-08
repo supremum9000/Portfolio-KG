@@ -85,7 +85,7 @@ export const contactContent = {
     relocationValue: 'Көчүүгө даяр: Кыргызстан',
     networkLabel: 'Кесиптик тармак',
     networkValue: 'LinkedIn',
-    responseTimeTitle: 'Жооп берүү мөөнөтү',
+    responseTimeTitle: 'Жооп берүү убактысы',
     responseTimeText: 'Адатта жумуш күндөрүндө 24-48 саат ичинде жооп берем.',
     formTitle: 'Кабар жөнөтүү',
     form: {
@@ -97,7 +97,7 @@ export const contactContent = {
       messagePlaceholder: 'Кабарыңыз...',
       submitLabel: 'Кабар жөнөтүү',
       submittingLabel: 'Сакталууда...',
-      successMessage: 'Кабар ийгиликтүү сакталды.',
+      successMessage: 'Кабар жергиликтүү түрдө сакталды.',
       errors: {
         nameRequired: 'Аты-жөнү киргизилиши керек',
         emailRequired: 'Email киргизилиши керек',

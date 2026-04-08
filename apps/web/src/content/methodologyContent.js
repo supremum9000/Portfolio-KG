@@ -385,13 +385,13 @@ export const methodologyContent = {
             ]
           },
           {
-            title: '5-блок. Талаптарды даярдоо жана traceability',
+            title: '5-блок. Талаптарды даярдоо жана изин байкоо',
             items: [
               'User Story: шаблон жана бөлүп алуу',
-              'Traceability: US → Use Cases',
+              'Изин байкоо: US → Use Cases',
               'BPMN жана C4 архитектурасынын байланышы',
               'UC → процесс модели (BPMN)',
-              'BPMN деги бизнес эрежелери',
+              'BPMNдеги бизнес эрежелери',
               'Талаптардын сапат атрибуттары'
             ]
           }
@@ -432,8 +432,8 @@ export const methodologyContent = {
       },
       {
         id: 'course-requirements-management-traceability',
-        menuTitle: 'Талаптарды башкаруу жана traceability: SMART → US → C4 → BPMN → UC',
-        title: 'Талаптарды башкаруу жана traceability: SMART → US → C4 → BPMN → UC',
+        menuTitle: 'Талаптарды башкаруу жана изин байкоо: SMART → US → C4 → BPMN → UC',
+        title: 'Талаптарды башкаруу жана изин байкоо: SMART → US → C4 → BPMN → UC',
         topicBlocks: [
           {
             title: '1-блок. Максат коюу',
@@ -445,18 +445,18 @@ export const methodologyContent = {
             ]
           },
           {
-            title: '2-блок. Traceability: User Stories → Use Cases',
+            title: '2-блок. Изин байкоо: User Stories → Use Cases',
             items: [
               'User Story түзүү',
-              'User Story ди Use Cases ка декомпозициялоо',
+              'User Story\'лерди Use Case\'терге ажыратуу',
               'Актор, бизнес объект, аракет, система, баалуулук',
-              'Use Cases функционалдык талаптардын негизи катары'
+              'Use Case\'тер функционалдык талаптардын негизи катары'
             ]
           },
           {
             title: '3-блок. C4 Level 1 даярдоо',
             items: [
-              'Use Cases тен алынган системалар жана акторлор',
+              'Use Case\'терден алынган системалар жана акторлор',
               'Системалар арасындагы маалымат агымдары жана чакыруулар',
               'C4 талаптар менен архитектуранын ортосундагы байланыштыруучу катмар катары'
             ]
@@ -464,7 +464,7 @@ export const methodologyContent = {
           {
             title: '4-блок. BPMN нотациясында процесс модели',
             items: [
-              'Use Cases ти BPMN де колдонуу',
+              'Use Case\'терди BPMNде колдонуу',
               'C4 Level 1 менен BPMN пулдарынын байланышы',
               'Message flows системалар арасындагы интеграция катары'
             ]
@@ -474,14 +474,14 @@ export const methodologyContent = {
             items: [
               'Business Rules процесс бутактануу шарттары катары',
               'XOR / OR gateways',
-              'Бизнес эрежелери менен BPMN нин байланышы',
+              'Бизнес эрежелери менен BPMNдин байланышы',
               'DMN татаал эрежелер үчүн'
             ]
           },
           {
-            title: '6-блок. Traceability жана талаптар сапаты',
+            title: '6-блок. Изин байкоо жана талаптар сапаты',
             items: [
-              'Талаптар traceability: SMART → US → UC → C4 → BPMN',
+              'Талаптарды изин байкоо: SMART → US → UC → C4 → BPMN',
               'API жана тесттер',
               'Талаптардын, архитектуранын жана процесс моделинин бүтүндүгүн көзөмөлдөө',
               'Талаптардын сапат атрибуттары',
