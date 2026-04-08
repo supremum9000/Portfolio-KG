@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BPMN Modeler - Local editor</title>
+  <link rel="stylesheet" href="https://unpkg.com/bpmn-js@18.12.0/dist/assets/diagram-js.css">
+  <link rel="stylesheet" href="https://unpkg.com/bpmn-js@18.12.0/dist/assets/bpmn-js.css">
+  <link rel="stylesheet" href="https://unpkg.com/bpmn-js@18.12.0/dist/assets/bpmn-font/css/bpmn.css">
+  <script src="https://unpkg.com/bpmn-js@18.12.0/dist/bpmn-modeler.development.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    [data-theme="dark"]{
+      --bg-primary:#0f1117;--bg-secondary:#1a1d27;--bg-tertiary:#242836;--bg-hover:#2e3348;
+      --accent:#6c8cff;--accent-glow:rgba(108,140,255,0.25);--accent-hover:#8ba4ff;
+      --text-primary:#e8eaf0;--text-secondary:#8b90a5;--text-muted:#5c6178;
+      --border:#2a2e3e;--success:#4ecdc4;--danger:#ff6b6b;
+      --shadow:0 4px 24px rgba(0,0,0,0.4);
+      --canvas-bg:#0f1117;--canvas-dot:rgba(255,255,255,0.06);
+      --overlay-bg:rgba(15,17,23,0.9);--modal-shadow:0 20px 60px rgba(0,0,0,0.5);
+      --tab-active-bg:#0f1117;--tab-bg:#14161e;
+    }
+    [data-theme="light"]{
+      --bg-primary:#f5f6f8;--bg-secondary:#ffffff;--bg-tertiary:#ebedf2;--bg-hover:#e2e5ec;
+      --accent:#4a6cf7;--accent-glow:rgba(74,108,247,0.18);--accent-hover:#3958e0;
+      --text-primary:#1a1d2b;--text-secondary:#5c6178;--text-muted:#9499b0;
+      --border:#dce0ea;--success:#2eb8a6;--danger:#e74c4c;
+      --shadow:0 4px 24px rgba(0,0,0,0.08);
+      --canvas-bg:#f5f6f8;--canvas-dot:rgba(0,0,0,0.06);
+      --overlay-bg:rgba(245,246,248,0.92);--modal-shadow:0 20px 60px rgba(0,0,0,0.12);
+      --tab-active-bg:#ffffff;--tab-bg:#ebedf2;
+    }
+    :root{--radius:10px;--radius-sm:6px}
+
+    /* === MODE SWITCH === */
+    .mode-switch{display:flex;background:var(--bg-tertiary);border-radius:var(--radius-sm);padding:2px;gap:2px;margin-left:4px}
+    .mode-btn{padding:4px 12px;border:none;border-radius:4px;background:transparent;color:var(--text-muted);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.3px}
+    .mode-btn.active{background:var(--accent);color:#fff;box-shadow:0 1px 4px var(--accent-glow)}
+    .mode-btn:hover:not(.active){color:var(--text-primary);background:var(--bg-hover)}
+    .locale-switch{display:flex;background:var(--bg-tertiary);border-radius:var(--radius-sm);padding:2px;gap:2px}
+    .locale-btn{padding:4px 10px;border:none;border-radius:4px;background:transparent;color:var(--text-muted);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.3px}
+    .locale-btn.active{background:var(--accent);color:#fff;box-shadow:0 1px 4px var(--accent-glow)}
+    .locale-btn:hover:not(.active){color:var(--text-primary);background:var(--bg-hover)}
+
+    /* === ER WORKSPACE === */
+    .er-workspace{display:none;flex:1;overflow:hidden}
+    .er-workspace.active{display:flex}
+    .er-editor-pane{width:380px;display:flex;flex-direction:column;border-right:1px solid var(--border);background:var(--bg-secondary);flex-shrink:0;overflow:hidden}
+    .er-editor-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .er-editor-header h3{font-size:12px;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:6px}
+    .er-editor-header .er-help-btn{font-size:10px;color:var(--text-muted);background:var(--bg-tertiary);border:1px solid var(--border);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit}
+    .er-editor-header .er-help-btn:hover{color:var(--accent);border-color:var(--accent)}
+    .er-code-wrap{flex:1;display:flex;overflow:hidden}
+    .er-line-numbers{width:38px;padding:14px 6px 14px 8px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;color:var(--text-muted);user-select:none;background:var(--bg-secondary);border-right:1px solid var(--border);overflow:hidden;flex-shrink:0;white-space:pre}
+    .er-editor-wrap{flex:1;position:relative;background:var(--bg-primary);overflow:hidden}
+    .er-dsl-editor{position:absolute;top:0;left:0;width:100%;height:100%;resize:none;background:transparent;color:transparent;border:none;padding:14px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;outline:none;tab-size:2;-moz-tab-size:2;z-index:2;-webkit-text-fill-color:transparent;caret-color:var(--text-primary);white-space:pre;overflow:auto;margin:0}
+    .er-dsl-editor::placeholder{-webkit-text-fill-color:var(--text-muted)}
+    .er-dsl-editor::selection{background:rgba(108,140,255,0.3)}
+    .er-highlight{position:absolute;top:0;left:0;padding:14px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;white-space:pre;z-index:1;pointer-events:none;tab-size:2;-moz-tab-size:2;color:var(--text-primary)}
+    .er-highlight .hl-kw{color:#c678dd;font-weight:600}
+    .er-highlight .hl-tname{color:#e5c07b;font-weight:600}
+    .er-highlight .hl-type{color:#56b6c2}
+    .er-highlight .hl-attr{color:#98c379}
+    .er-highlight .hl-bracket{color:#abb2bf}
+    .er-highlight .hl-ref{color:#6c8cff;font-weight:600}
+    .er-highlight .hl-comment{color:var(--text-muted);font-style:italic}
+    .er-highlight .hl-field{color:#e06c75}
+    .er-highlight .hl-punct{color:#abb2bf}
+    [data-theme="light"] .er-highlight .hl-kw{color:#7c4dff}
+    [data-theme="light"] .er-highlight .hl-tname{color:#0d47a1}
+    [data-theme="light"] .er-highlight .hl-type{color:#00796b}
+    [data-theme="light"] .er-highlight .hl-attr{color:#e65100}
+    [data-theme="light"] .er-highlight .hl-bracket{color:#546e7a}
+    [data-theme="light"] .er-highlight .hl-ref{color:#304ffe}
+    [data-theme="light"] .er-highlight .hl-comment{color:#9e9e9e}
+    [data-theme="light"] .er-highlight .hl-field{color:#c62828}
+    [data-theme="light"] .er-highlight .hl-punct{color:#546e7a}
+    .er-preview-pane{flex:1;position:relative;background:var(--bg-primary);overflow:hidden}
+    .er-preview-pane svg{position:absolute;inset:0;width:100%;height:100%}
+    .er-canvas{width:100%;height:100%;cursor:grab}
+    .er-canvas:active{cursor:grabbing}
+    .er-statusbar{display:flex;align-items:center;gap:12px;padding:0 14px;border-top:1px solid var(--border);flex-shrink:0;font-size:10px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;height:24px;background:var(--bg-secondary)}
+    .er-error{color:var(--danger);font-weight:600;white-space:pre-line}
+    .er-resize-handle{width:4px;cursor:col-resize;background:transparent;flex-shrink:0;transition:background .15s}
+    .er-resize-handle:hover,.er-resize-handle.dragging{background:var(--accent)}
+    .er-help-popup{position:absolute;top:40px;left:14px;z-index:300;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;width:340px;font-size:11px;line-height:1.7;display:none}
+    .er-help-popup.open{display:block}
+    .er-help-popup h4{font-size:12px;margin-bottom:8px;color:var(--accent)}
+    .er-help-popup code{background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px}
+    .er-help-popup pre{background:var(--bg-tertiary);padding:10px;border-radius:var(--radius-sm);margin:8px 0;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.6;color:var(--text-secondary)}
+
+    /* === PROJECT PANEL === */
+    .main-content{display:flex;flex:1;overflow:hidden;min-height:0}
+    .workspace-content{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+    .project-panel{width:260px;background:var(--bg-secondary);border-right:1px solid var(--border);display:none;flex-direction:column;flex-shrink:0;overflow:hidden;font-size:12px}
+    .project-panel.open{display:flex}
+    .project-panel-header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .project-panel-header h3{font-size:12px;font-weight:600;color:var(--text-secondary);white-space:nowrap}
+    .project-panel-header div{display:flex;gap:2px}
+    .project-panel-btn{padding:3px 6px!important;font-size:13px!important;min-width:auto!important;line-height:1}
+    .project-panel-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 0;scrollbar-width:thin;scrollbar-color:var(--bg-hover) transparent}
+    .pt-project-header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-weight:600;cursor:pointer;color:var(--text-primary)}
+    .pt-project-header:hover{background:var(--bg-hover)}
+    .pt-project-header.active-project{color:var(--accent)}
+    .pt-group{display:flex;align-items:center;justify-content:space-between;padding:6px 12px 2px 16px;font-weight:600;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;cursor:pointer}
+    .pt-group:hover{color:var(--text-secondary)}
+    .pt-group-add{opacity:0;transition:opacity .15s;font-size:14px;cursor:pointer;color:var(--text-muted)}
+    .pt-group:hover .pt-group-add,.pt-project-header:hover .pt-group-add{opacity:1}
+    .pt-group-add:hover{color:var(--accent)}
+    .pt-file{padding:4px 12px 4px 28px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .pt-file:hover{background:var(--bg-hover);color:var(--text-primary)}
+    .pt-file.active{color:var(--accent);background:var(--accent-glow)}
+    .pt-file.selected{background:var(--bg-hover);color:var(--text-primary)}
+    .project-resize-handle{display:none;width:4px;cursor:col-resize;background:transparent;flex-shrink:0;transition:background .15s}
+    .project-resize-handle.open{display:block}
+    .project-resize-handle:hover,.project-resize-handle.dragging{background:var(--accent)}
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body,.topbar,.statusbar,.xml-panel,.xml-editor,.modal,.toast,#canvas,.btn,.filename-input,.zoom-btn,kbd,.djs-palette,.djs-popup,.tabs-bar,.tab{transition:background-color .3s,color .3s,border-color .3s,box-shadow .3s}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg-primary);color:var(--text-primary);overflow:hidden;height:100vh;display:flex;flex-direction:column}
+
+    /* === TOPBAR === */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:48px;background:var(--bg-secondary);border-bottom:1px solid var(--border);flex-shrink:0;z-index:100}
+    .topbar-left{display:flex;align-items:center;gap:12px}
+    .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;letter-spacing:-.3px}
+    .logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--accent),#a78bfa);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;box-shadow:0 2px 10px var(--accent-glow)}
+    .divider-v{width:1px;height:24px;background:var(--border)}
+    .toolbar{display:flex;gap:2px;align-items:center}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:none;border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+    .btn:hover{background:var(--bg-hover);color:var(--text-primary)}
+    .btn:active{transform:scale(.97)}
+    .btn svg{width:15px;height:15px;flex-shrink:0}
+    .btn-accent{background:var(--accent);color:#fff}
+    .btn-accent:hover{background:var(--accent-hover);color:#fff}
+    .btn-outline{border:1px solid var(--border)}
+    .btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+    .topbar-right{display:flex;align-items:center;gap:6px}
+
+    /* === EXPORT DROPDOWN === */
+    .dropdown{position:relative}
+    .dropdown-menu{position:absolute;top:100%;right:0;margin-top:4px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);min-width:180px;z-index:300;display:none;overflow:hidden}
+    .dropdown-menu.open{display:block}
+    .dropdown-item{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:12px;color:var(--text-secondary);cursor:pointer;transition:all .12s;border:none;background:none;width:100%;font-family:inherit;text-align:left}
+    .dropdown-item:hover{background:var(--bg-hover);color:var(--text-primary)}
+    .dropdown-item svg{width:15px;height:15px;flex-shrink:0}
+    .dropdown-sep{height:1px;background:var(--border);margin:2px 0}
+
+    /* === THEME TOGGLE === */
+    .theme-toggle{position:relative;width:50px;height:26px;border-radius:13px;background:var(--bg-tertiary);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;padding:0 3px;transition:all .3s;flex-shrink:0}
+    .theme-toggle:hover{border-color:var(--accent)}
+    .theme-toggle-thumb{width:20px;height:20px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;transition:transform .35s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 6px rgba(0,0,0,.25);z-index:2}
+    .theme-toggle-thumb svg{width:12px;height:12px;color:#fff;stroke:#fff;fill:none}
+    [data-theme="light"] .theme-toggle-thumb{transform:translateX(23px)}
+    .theme-toggle-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 7px;pointer-events:none;font-size:11px;line-height:1}
+    .theme-toggle-bg span{opacity:.35;transition:opacity .3s}
+    [data-theme="dark"] .theme-toggle-bg .t-moon{opacity:1}
+    [data-theme="light"] .theme-toggle-bg .t-sun{opacity:1}
+
+    /* === TABS BAR === */
+    .tabs-bar{display:flex;align-items:stretch;background:var(--bg-tertiary);border-bottom:1px solid var(--border);flex-shrink:0;height:36px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+    .tabs-bar::-webkit-scrollbar{display:none}
+    .tabs-scroll{display:flex;align-items:stretch;min-width:0}
+    .tab{display:flex;align-items:center;gap:6px;padding:0 14px;font-size:12px;font-weight:500;color:var(--text-muted);cursor:pointer;border-right:1px solid var(--border);background:var(--tab-bg);white-space:nowrap;position:relative;min-width:0;max-width:200px;user-select:none;transition:all .15s}
+    .tab:hover{color:var(--text-secondary);background:var(--bg-hover)}
+    .tab.active{color:var(--text-primary);background:var(--tab-active-bg);font-weight:600}
+    .tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--accent)}
+    .tab-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .tab-modified{color:var(--accent);font-size:16px;line-height:1;margin-left:-2px}
+    .tab-close{display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;font-size:14px;line-height:1;padding:0;transition:all .12s;flex-shrink:0;margin-left:2px}
+    .tab-close:hover{background:var(--danger);color:#fff}
+    .tab-add{display:flex;align-items:center;justify-content:center;width:36px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;font-size:18px;transition:all .12s;flex-shrink:0}
+    .tab-add:hover{color:var(--accent);background:var(--bg-hover)}
+
+    /* === CANVAS === */
+    .canvas-wrapper{flex:1;position:relative;overflow:hidden}
+    #canvas{width:100%;height:100%;background:var(--canvas-bg)}
+    #canvas .djs-container{background-image:radial-gradient(var(--canvas-dot) 1px,transparent 1px)!important;background-size:20px 20px!important}
+
+    /* bpmn-js overrides */
+    .djs-palette{background:var(--bg-secondary)!important;border:1px solid var(--border)!important;border-radius:var(--radius)!important;box-shadow:var(--shadow)!important;top:16px!important;left:16px!important}
+    .djs-palette .entry{color:var(--text-secondary)!important}
+    .djs-palette .entry:hover{color:var(--accent)!important}
+    .djs-palette .separator{border-color:var(--border)!important}
+    .djs-context-pad .entry:hover{background:var(--accent)!important}
+    .djs-popup{background:var(--bg-secondary)!important;border:1px solid var(--border)!important;border-radius:var(--radius)!important;box-shadow:var(--shadow)!important;color:var(--text-primary)!important}
+    .djs-popup .entry{color:var(--text-primary)!important}
+    .djs-popup .entry:hover{background:var(--bg-hover)!important}
+    .djs-popup input,.djs-popup .search input{background:var(--bg-tertiary)!important;color:var(--text-primary)!important;border-color:var(--border)!important}
+    [data-theme="dark"] .djs-element .djs-visual>:is(rect,circle,ellipse,polygon,polyline,path){stroke:#c0c6d6!important}
+    [data-theme="dark"] .djs-element .djs-visual text{fill:#d8dbe5!important}
+    [data-theme="dark"] .djs-connection .djs-visual path{stroke:#8b90a5!important}
+    .djs-element.hover .djs-outline,.djs-element.selected .djs-outline{stroke:var(--accent)!important}
+    .djs-direct-editing-parent{background:var(--bg-secondary)!important;color:var(--text-primary)!important;border:1px solid var(--accent)!important;border-radius:4px!important}
+
+    /* === EXTENDED PALETTE POPUP === */
+    .ext-palette-overlay{position:fixed;inset:0;z-index:400;display:none}
+    .ext-palette-overlay.open{display:block}
+    .ext-palette{position:absolute;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);width:280px;max-height:480px;display:flex;flex-direction:column;overflow:hidden;z-index:401;font-family:'DM Sans',sans-serif}
+    .ext-palette-search{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .ext-palette-search input{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-tertiary);color:var(--text-primary);font-family:inherit;font-size:12px;outline:none;transition:border-color .15s}
+    .ext-palette-search input:focus{border-color:var(--accent)}
+    .ext-palette-search input::placeholder{color:var(--text-muted)}
+    .ext-palette-list{flex:1;overflow-y:auto;padding:6px 0;scrollbar-width:thin;scrollbar-color:var(--bg-hover) transparent}
+    .ext-palette-group{padding:4px 12px 2px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);user-select:none}
+    .ext-palette-item{display:flex;align-items:center;gap:10px;padding:7px 12px;cursor:pointer;transition:background .1s;font-size:12px;color:var(--text-secondary);user-select:none}
+    .ext-palette-item:hover{background:var(--bg-hover);color:var(--text-primary)}
+    .ext-palette-item .ep-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .ext-palette-item .ep-icon svg{width:18px;height:18px}
+    .ext-palette-empty{padding:20px 12px;text-align:center;color:var(--text-muted);font-size:12px}
+
+    /* === STATUSBAR === */
+    .statusbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:28px;background:var(--bg-secondary);border-top:1px solid var(--border);flex-shrink:0;font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+    .statusbar-left,.statusbar-right{display:flex;align-items:center;gap:14px}
+    .status-dot{width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block;margin-right:5px;animation:pulse-dot 2s infinite}
+    @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
+    .zoom-controls{display:flex;align-items:center;gap:3px}
+    .zoom-btn{background:transparent;border:none;color:var(--text-muted);cursor:pointer;padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:11px;transition:all .15s}
+    .zoom-btn:hover{background:var(--bg-hover);color:var(--text-primary)}
+
+    /* === TOAST === */
+    .toast{position:fixed;bottom:44px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius);padding:10px 20px;font-size:12px;font-weight:500;color:var(--text-primary);box-shadow:var(--shadow);z-index:1000;opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;display:flex;align-items:center;gap:8px}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    #file-input{display:none}
+
+    /* === DROP OVERLAY === */
+    .drop-overlay{position:fixed;inset:0;background:var(--overlay-bg);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:500;flex-direction:column}
+    .drop-overlay.active{display:flex}
+    .drop-overlay-content{border:2px dashed var(--accent);border-radius:20px;padding:50px 70px;text-align:center;color:var(--accent);font-size:17px;font-weight:600}
+    .drop-overlay-sub{color:var(--text-muted);font-size:13px;margin-top:8px}
+
+    /* === MODAL === */
+    .modal-overlay{position:fixed;inset:0;background:var(--overlay-bg);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:600}
+    .modal-overlay.active{display:flex}
+    .modal{background:var(--bg-secondary);border:1px solid var(--border);border-radius:16px;padding:28px;width:420px;max-height:80vh;overflow-y:auto;box-shadow:var(--modal-shadow)}
+    .modal h2{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .shortcut-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)}
+    .shortcut-row:last-child{border-bottom:none}
+    .shortcut-label{color:var(--text-secondary);font-size:12px}
+    .shortcut-keys{display:flex;gap:3px}
+    kbd{background:var(--bg-tertiary);border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-primary)}
+
+    /* === XML PANEL === */
+    .xml-panel{position:fixed;right:0;top:84px;bottom:28px;width:480px;background:var(--bg-secondary);border-left:1px solid var(--border);z-index:200;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+    .xml-panel.open{transform:translateX(0)}
+    .xml-panel-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .xml-panel-header h3{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+    .xml-editor{flex:1;width:100%;resize:none;background:var(--bg-primary);color:var(--text-primary);border:none;padding:14px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;outline:none}
+    .xml-panel-footer{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--border);flex-shrink:0}
+
+    /* === PROPERTIES PANEL === */
+    .props-panel{position:fixed;right:0;top:84px;bottom:28px;width:300px;background:var(--bg-secondary);border-left:1px solid var(--border);z-index:190;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);font-size:12px}
+    .props-panel.open{transform:translateX(0)}
+    .props-panel-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .props-panel-header h3{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;margin:0}
+    .props-panel-body{flex:1;overflow-y:auto;padding:0;scrollbar-width:thin;scrollbar-color:var(--bg-hover) transparent}
+    .props-section{border-bottom:1px solid var(--border)}
+    .props-section-title{padding:10px 14px 6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);user-select:none}
+    .props-field{padding:4px 14px 8px}
+    .props-field label{display:block;font-size:11px;color:var(--text-secondary);margin-bottom:3px;font-weight:500}
+    .props-field input,.props-field textarea,.props-field select{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-tertiary);color:var(--text-primary);font-family:inherit;font-size:12px;outline:none;transition:border-color .15s}
+    .props-field input:focus,.props-field textarea:focus,.props-field select:focus{border-color:var(--accent)}
+    .props-field textarea{resize:vertical;min-height:56px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.5}
+    .props-field select{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b90a5' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:28px}
+    .props-empty{padding:40px 14px;text-align:center;color:var(--text-muted)}
+    .props-empty-icon{font-size:28px;margin-bottom:8px;opacity:.5}
+    .props-type-badge{display:inline-block;padding:2px 8px;border-radius:10px;background:var(--accent-glow);color:var(--accent);font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace}
+    .props-color-row{display:flex;align-items:center;gap:8px;padding:4px 14px 8px}
+    .props-color-row label{font-size:11px;color:var(--text-secondary);font-weight:500;min-width:60px}
+    .props-color-group{display:flex;align-items:center;gap:6px;flex:1}
+    .props-color-input{width:32px;height:32px;border:2px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;padding:0;background:none;-webkit-appearance:none;appearance:none;overflow:hidden}
+    .props-color-input::-webkit-color-swatch-wrapper{padding:0}
+    .props-color-input::-webkit-color-swatch{border:none;border-radius:3px}
+    .props-color-input::-moz-color-swatch{border:none;border-radius:3px}
+    .props-color-input:hover{border-color:var(--accent)}
+    .props-color-hex{width:80px;padding:5px 7px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-tertiary);color:var(--text-primary);font-family:'JetBrains Mono',monospace;font-size:11px;outline:none}
+    .props-color-hex:focus{border-color:var(--accent)}
+    .props-color-reset{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-muted);cursor:pointer;padding:4px 8px;font-size:10px;font-family:inherit;transition:all .12s}
+    .props-color-reset:hover{border-color:var(--danger);color:var(--danger)}
+    .props-color-presets{display:flex;gap:4px;padding:2px 14px 10px;flex-wrap:wrap}
+    .props-color-preset{width:20px;height:20px;border-radius:4px;border:2px solid transparent;cursor:pointer;transition:all .12s}
+    .props-color-preset:hover{border-color:var(--accent);transform:scale(1.15)}
+    .props-color-preset.active{border-color:var(--text-primary)}
+
+    @media(max-width:768px){.topbar{padding:0 10px}.btn span{display:none}.xml-panel{width:100%}.tab{max-width:140px}.props-panel{width:100%}}
+  </style>
+</head>
+<body>
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo"><div class="logo-icon">B</div><span>BPMN Modeler</span></div>
+      <div class="mode-switch">
+        <button class="mode-btn active" id="modeBpmn" onclick="switchModeByButton('bpmn')">BPMN</button>
+        <button class="mode-btn" id="modeEr" onclick="switchModeByButton('er')">ER</button>
+      </div>
+      <div class="divider-v"></div>
+      <button class="btn" id="btnProjectsEl" onclick="toggleProjectPanel()" title="Проекты"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span>Проекты</span></button>
+      <div class="divider-v"></div>
+      <div class="toolbar" id="bpmnToolbar">
+        <button class="btn" onclick="createNewTab()" title="Новая диаграмма (Ctrl+N)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg><span>Новая</span></button>
+        <button class="btn" onclick="openFile()" title="Открыть (Ctrl+O)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span>Открыть</span></button>
+        <button class="btn" onclick="saveActiveTab()" title="Сохранить (Ctrl+S)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg><span>Сохранить</span></button>
+        <button class="btn" onclick="saveAsDialog()" title="Сохранить как (Ctrl+Shift+S)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/><line x1="12" y1="18" x2="18" y2="18"/></svg><span>Сохранить как…</span></button>
+        <div class="divider-v"></div>
+        <div class="dropdown">
+          <button class="btn" onclick="toggleExportMenu()" title="Экспорт"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Экспорт ▾</span></button>
+          <div class="dropdown-menu" id="exportMenu">
+            <button class="dropdown-item" onclick="saveSVG();closeExportMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg> Скачать SVG</button>
+            <button class="dropdown-item" onclick="exportPNG();closeExportMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg> Скачать PNG</button>
+            <button class="dropdown-item" onclick="exportPNG(2);closeExportMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg> Скачать PNG @2x</button>
+            <div class="dropdown-sep"></div>
+            <button class="dropdown-item" onclick="exportPDF();closeExportMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg> Скачать PDF</button>
+          </div>
+        </div>
+        <div class="divider-v"></div>
+        <button class="btn" onclick="undo()" title="Отменить (Ctrl+Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 105.59-9.1L1 10"/></svg></button>
+        <button class="btn" onclick="redo()" title="Повторить (Ctrl+Y)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 11-5.59-9.1L23 10"/></svg></button>
+        <div class="divider-v"></div>
+        <button class="btn" onclick="doCut()" title="Вырезать (Ctrl+X)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg><span>Вырезать</span></button>
+        <button class="btn" onclick="doCopy()" title="Копировать (Ctrl+C)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span>Копировать</span></button>
+        <button class="btn" onclick="doPaste()" id="btnPaste" title="Вставить (Ctrl+V)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg><span>Вставить</span></button>
+        <div class="divider-v"></div>
+        <button class="btn" onclick="toggleXmlPanel()" title="XML (Ctrl+E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/></svg><span>XML</span></button>
+        <button class="btn" onclick="togglePropsPanel()" title="Свойства (Ctrl+P)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Свойства</span></button>
+      </div>
+      <!-- ER TOOLBAR -->
+      <div class="toolbar" id="erToolbar" style="display:none">
+        <button class="btn" onclick="erOpenDsl()" title="Открыть ER"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span>Открыть</span></button>
+        <button class="btn" onclick="saveActiveTab()" title="Сохранить ER"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg><span>Сохранить</span></button>
+        <div class="divider-v"></div>
+        <div class="dropdown">
+          <button class="btn" onclick="toggleErExportMenu()" title="Экспорт ER"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Экспорт ▾</span></button>
+          <div class="dropdown-menu" id="erExportMenu">
+            <button class="dropdown-item" onclick="erExportSVG();closeErExportMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg> Скачать SVG</button>
+            <button class="dropdown-item" onclick="erExportPNG();closeErExportMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg> Скачать PNG</button>
+            <button class="dropdown-item" onclick="erExportPNG(2);closeErExportMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg> Скачать PNG @2x</button>
+            <div class="dropdown-sep"></div>
+            <button class="dropdown-item" onclick="erExportPDF();closeErExportMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg> Скачать PDF</button>
+          </div>
+        </div>
+        <div class="divider-v"></div>
+        <button class="btn" onclick="erResetLayout()" title="Сбросить позиции"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Автолейаут</span></button>
+        <button class="btn" onclick="erZoomFit()" title="Вписать в экран"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg><span>Вписать</span></button>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="locale-switch" role="group" aria-label="Language switcher">
+        <button class="locale-btn" id="localeRu" onclick="setModelerLocale('ru')" title="Русский">RU</button>
+        <button class="locale-btn" id="localeEn" onclick="setModelerLocale('en')" title="English">EN</button>
+        <button class="locale-btn" id="localeKy" onclick="setModelerLocale('ky')" title="Кыргызча">KY</button>
+      </div>
+      <div class="theme-toggle" onclick="toggleTheme()" title="Тема (Ctrl+Shift+T)">
+        <div class="theme-toggle-thumb" id="toggleThumb"></div>
+        <div class="theme-toggle-bg"><span class="t-moon">🌙</span><span class="t-sun">☀️</span></div>
+      </div>
+      <button class="btn btn-outline" onclick="showShortcuts()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M8 16h8"/></svg></button>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs-bar">
+    <div class="tabs-scroll" id="tabsScroll"></div>
+    <button class="tab-add" onclick="createNewTab()" title="Новая вкладка">+</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content" id="mainContentEl">
+    <aside class="project-panel" id="projectPanelEl">
+      <div class="project-panel-header"><h3>📁 Проекты</h3><div><button class="btn project-panel-btn" onclick="createNewProject()" title="Новый проект">＋</button><button class="btn project-panel-btn" onclick="openProjectFolder()" title="Открыть папку">📂</button><button class="btn project-panel-btn" onclick="toggleProjectPanel()" title="Скрыть">✕</button></div></div>
+      <div class="project-panel-body" id="projectTreeEl"></div>
+    </aside>
+    <div class="project-resize-handle" id="projectResizeEl"></div>
+    <div class="workspace-content" id="workspaceContentEl">
+    <!-- CANVAS (BPMN) -->
+    <div class="canvas-wrapper" id="bpmnWorkspace"><div id="canvas"></div></div>
+
+  <!-- ER WORKSPACE -->
+  <div class="er-workspace" id="erWorkspace">
+    <div class="er-editor-pane" id="erEditorPane">
+      <div class="er-editor-header">
+        <h3>📐 DSL Редактор</h3>
+        <button class="er-help-btn" onclick="toggleErHelp()">? Синтаксис</button>
+      </div>
+      <div class="er-code-wrap">
+        <div class="er-help-popup" id="erHelp">
+          <h4>Синтаксис ER DSL</h4>
+<pre>Table users {
+  id int [pk]
+  name varchar
+  email varchar [unique]
+  role_id int [ref: > roles.id]
+}
+
+Table roles {
+  id int [pk]
+  name varchar
+}
+
+Ref: users.role_id > roles.id</pre>
+          <p><strong>Типы связей:</strong></p>
+          <p><code>&gt;</code> many-to-one &nbsp; <code>&lt;</code> one-to-many &nbsp; <code>-</code> one-to-one &nbsp; <code>&lt;&gt;</code> many-to-many</p>
+          <p><strong>Атрибуты:</strong> <code>[pk]</code> <code>[unique]</code> <code>[not null]</code> <code>[default: 0]</code> <code>[note: 'text']</code></p>
+        </div>
+        <div class="er-line-numbers" id="erLineNumbers"></div>
+        <div class="er-editor-wrap" id="erEditorWrap">
+          <div class="er-highlight" id="erHighlight" aria-hidden="true"></div>
+          <textarea class="er-dsl-editor" id="erDslEditor" spellcheck="false" placeholder="Table users {&#10;  id int [pk]&#10;  name varchar&#10;  email varchar [unique]&#10;}"></textarea>
+        </div>
+      </div>
+      <div class="er-statusbar"><span id="erStatus">0 таблиц, 0 связей</span><span id="erError"></span></div>
+    </div>
+    <div class="er-resize-handle" id="erResizeHandle"></div>
+    <div class="er-preview-pane" id="erPreviewPane">
+      <svg id="erCanvas" class="er-canvas"></svg>
+    </div>
+  </div>
+    </div><!-- /workspace-content -->
+  </div><!-- /main-content -->
+
+  <!-- STATUSBAR -->
+  <footer class="statusbar">
+    <div class="statusbar-left">
+      <span><span class="status-dot"></span>Готов</span>
+      <span id="element-count">0 элементов</span>
+    </div>
+    <div class="statusbar-right">
+      <div class="zoom-controls">
+        <button class="zoom-btn" onclick="zoomOut()">−</button>
+        <span id="zoom-level">100%</span>
+        <button class="zoom-btn" onclick="zoomIn()">+</button>
+        <button class="zoom-btn" onclick="zoomFit()">⊞</button>
+        <button class="zoom-btn" onclick="zoomReset()">1:1</button>
+      </div>
+      <span id="theme-label">Светлая</span>
+      <span>v18.12</span>
+    </div>
+  </footer>
+
+  <!-- OVERLAYS -->
+  <div class="drop-overlay" id="dropOverlay"><div class="drop-overlay-content">📂 Перетащите .bpmn файл<div class="drop-overlay-sub">Откроется в новой вкладке</div></div></div>
+
+  <div class="modal-overlay" id="shortcutsModal" onclick="if(event.target===this)hideShortcuts()">
+    <div class="modal">
+      <h2>⌨️ Горячие клавиши</h2>
+      <div class="shortcut-row"><span class="shortcut-label">Новая вкладка</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>N</kbd></div></div>
+      <div class="shortcut-row"><span class="shortcut-label">Открыть файл</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>O</kbd></div></div>
+      <div class="shortcut-row"><span class="shortcut-label">Сохранить</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>S</kbd></div></div>
+      <div class="shortcut-row"><span class="shortcut-label">Сохранить проект / Сохранить как…</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>S</kbd></div></div>
+      <div class="shortcut-row"><span class="shortcut-label">Закрыть вкладку</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>W</kbd></div></div>
+      <div class="shortcut-row"><span class="shortcut-label">Отменить / Повторить</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>Z</kbd><kbd>Y</kbd></div></div>
+      <div class="shortcut-row"><span class="shortcut-label">Вырезать элементы</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>X</kbd></div></div>
+      <div class="shortcut-row"><span class="shortcut-label">Копировать элементы</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>C</kbd></div></div>
+      <div class="shortcut-row"><span class="shortcut-label">Вставить элементы</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>V</kbd></div></div>
+      <div class="shortcut-row"><span class="shortcut-label">XML редактор</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>E</kbd></div></div>
+      <div class="shortcut-row"><span class="shortcut-label">Панель свойств</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>P</kbd></div></div>
+      <div class="shortcut-row"><span class="shortcut-label">Переключить тему</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>T</kbd></div></div>
+      <div class="shortcut-row"><span class="shortcut-label">Перемещение холста</span><div class="shortcut-keys"><kbd>Пробел</kbd><kbd>+Мышь</kbd></div></div>
+    </div>
+  </div>
+
+  <!-- PROPERTIES PANEL -->
+  <div class="props-panel" id="propsPanel">
+    <div class="props-panel-header">
+      <h3><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9"/></svg> Свойства</h3>
+      <button class="btn" onclick="togglePropsPanel()">✕</button>
+    </div>
+    <div class="props-panel-body" id="propsPanelBody"></div>
+  </div>
+
+  <!-- XML PANEL -->
+  <div class="xml-panel" id="xmlPanel">
+    <div class="xml-panel-header">
+      <h3><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/></svg> XML</h3>
+      <button class="btn" onclick="toggleXmlPanel()">✕</button>
+    </div>
+    <textarea class="xml-editor" id="xmlEditor" spellcheck="false"></textarea>
+    <div class="xml-panel-footer">
+      <button class="btn btn-accent" onclick="applyXml()">✓ Применить</button>
+      <button class="btn btn-outline" onclick="refreshXml()">↻ Обновить</button>
+    </div>
+  </div>
+
+  <!-- EXTENDED PALETTE POPUP -->
+  <div class="ext-palette-overlay" id="extPaletteOverlay" onclick="closeExtPalette()">
+    <div class="ext-palette" id="extPalette" onclick="event.stopPropagation()">
+      <div class="ext-palette-search"><input type="text" id="extPaletteSearch" placeholder="Поиск элементов…" autocomplete="off" oninput="filterExtPalette()"></div>
+      <div class="ext-palette-list" id="extPaletteList"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toastEl"><span id="toastIcon"></span><span id="toastMsg"></span></div>
+  <input type="file" id="file-input" accept=".bpmn,.xml,.erdsl" multiple>
+  <input type="file" id="er-file-input" accept=".erdsl,.txt,.sql" style="display:none">
+
+  <!-- SCRIPTS: порядок важен — shared первый, затем модули, затем init -->
+  <script src="locale.js"></script>
+  <script src="shared.js"></script>
+  <script src="er.js"></script>
+  <script src="bpmn.js"></script>
+  <script src="projects.js"></script>
+  <script>
+    // === INIT ===
+    (async function(){
+      initializeModelerLocale();
+      var savedTheme=localStorage.getItem('bpmn-theme');
+      applyTheme(savedTheme||'light');
+      initEr();
+      await initBpmn();
+      initProjectPanel();
+      toast('✅','Готов к работе');
+    })();
+  </script>
+</body>
+</html>
