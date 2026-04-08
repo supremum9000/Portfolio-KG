@@ -88,7 +88,6 @@ function ContactPage() {
                       <div>
                         <h3 className="mb-1 font-medium">{content.locationLabel}</h3>
                         <p className="text-muted-foreground">{content.locationValue}</p>
-                        <p className="text-sm text-muted-foreground">{content.relocationValue}</p>
                       </div>
                     </div>
                   </div>
