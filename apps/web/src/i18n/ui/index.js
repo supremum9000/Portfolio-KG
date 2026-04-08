@@ -1,9 +1,9 @@
 import en from './en';
 import ru from './ru';
-import ky from './ky';
+import kg from './kg';
 
 export const uiMessages = {
   en,
   ru,
-  ky
+  kg
 };

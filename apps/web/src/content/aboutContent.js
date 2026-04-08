@@ -69,7 +69,7 @@ export const aboutContent = {
       }
     ]
   },
-  ky: {
+  kg: {
     metaTitle: 'Мен жөнүндө - Vladimir Belov',
     metaDescription:
       'Vladimir Belov жөнүндө: финтех, телекоммуникация, мунай-газ жана курулуш тармактарында 18+ жылдык тажрыйбасы бар системдик жана бизнес-аналитик.',

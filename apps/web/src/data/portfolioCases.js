@@ -67,7 +67,7 @@ export const portfolioPageContent = {
       outcome: 'Результаты'
     }
   },
-  ky: {
+  kg: {
     metaTitle: 'Портфолио - Vladimir Belov',
     metaDescription:
       'Владимир Беловдун телекоммуникация, финтех, өнөр жай курулушу жана мунай-газ тармактарындагы тандалган кейстери: антифрод, сервис дизайны, инженердик долбоорлорду башкаруу, АТМда макулдук кол коюу жана сатып алуу системалары.',
@@ -585,7 +585,7 @@ export const portfolioCases = {
       ]
     }
   ],
-  ky: [
+  kg: [
     {
       id: 'fraud-detection',
       sectors: ['telecom'],

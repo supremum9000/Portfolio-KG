@@ -71,7 +71,7 @@ export const contactContent = {
       }
     }
   },
-  ky: {
+  kg: {
     metaTitle: 'Байланыш - Vladimir Belov',
     metaDescription:
       'Vladimir Belov менен системдик талдоо, бизнес талдоо, корпоративдик архитектура, антифрод чечимдери жана талаптарды иштеп чыгуу боюнча байланышуу.',

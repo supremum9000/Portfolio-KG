@@ -153,7 +153,7 @@ export const skillsContent = {
       }
     ]
   },
-  ky: {
+  kg: {
     metaTitle: 'Көндүмдөр - Vladimir Belov',
     metaDescription:
       'Vladimir Belovдун талдоо, архитектура, технологиялар, долбоор иштери жана кошумча бизнес тармактары боюнча көндүмдөрү жана компетенциялары.',

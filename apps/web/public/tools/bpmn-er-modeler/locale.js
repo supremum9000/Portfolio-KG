@@ -1,5 +1,5 @@
 (function () {
-  var SUPPORTED_LOCALES = ['ru', 'en', 'ky'];
+  var SUPPORTED_LOCALES = ['ru', 'en', 'kg'];
   var LOCALE_STORAGE_KEY = 'bpmn-modeler-locale';
   var currentLocale = 'ru';
   var localeObserver = null;
@@ -272,7 +272,7 @@
       'Нет несохранённых файлов': 'No unsaved files',
       'Русский': 'Russian'
     },
-    ky: {
+    kg: {
       'Проекты': 'Долбоорлор',
       'Новая диаграмма (Ctrl+N)': 'Жаңы диаграмма (Ctrl+N)',
       'Открыть (Ctrl+O)': 'Ачуу (Ctrl+O)',
@@ -650,7 +650,7 @@
         replace: function (_, saved, total) { return 'Saved ' + saved + ' of ' + total + ' files'; }
       }
     ],
-    ky: [
+    kg: [
       {
         regex: /^«(.+)» открыт$/,
         replace: function (_, name) { return '"' + name + '" ачылды'; }
@@ -903,17 +903,17 @@
   function updateLocaleButtons() {
     var ruButton = document.getElementById('localeRu');
     var enButton = document.getElementById('localeEn');
-    var kyButton = document.getElementById('localeKy');
+    var kgButton = document.getElementById('localeKg');
     if (!ruButton || !enButton) {
       return;
     }
 
     ruButton.classList.toggle('active', currentLocale === 'ru');
     enButton.classList.toggle('active', currentLocale === 'en');
-    if (kyButton) kyButton.classList.toggle('active', currentLocale === 'ky');
-    ruButton.title = currentLocale === 'en' ? 'Russian' : currentLocale === 'ky' ? 'Орусча' : 'Русский';
+    if (kgButton) kgButton.classList.toggle('active', currentLocale === 'kg');
+    ruButton.title = currentLocale === 'en' ? 'Russian' : currentLocale === 'kg' ? 'Орусча' : 'Русский';
     enButton.title = 'English';
-    if (kyButton) kyButton.title = currentLocale === 'en' ? 'Kyrgyz' : currentLocale === 'ky' ? 'Кыргызча' : 'Кыргызский';
+    if (kgButton) kgButton.title = currentLocale === 'en' ? 'Kyrgyz' : currentLocale === 'kg' ? 'Кыргызча' : 'Кыргызский';
   }
 
   function getDefaultErDsl() {
@@ -944,7 +944,7 @@
         + 'Ref: requests.status_id > statuses.id';
     }
 
-    if (currentLocale === 'ky') {
+    if (currentLocale === 'kg') {
       return 'Table koldonuuchular {\n'
         + '  id int [pk]\n'
         + '  login varchar\n'
@@ -1012,7 +1012,7 @@
         + 'Ref: users.role_id > roles.id';
     }
 
-    if (currentLocale === 'ky') {
+    if (currentLocale === 'kg') {
       return 'Table koldonuuchular {\n'
         + '  id int [pk]\n'
         + '  name varchar\n'
@@ -1044,7 +1044,7 @@
       return 'Table users {\n  id int [pk]\n  name varchar\n  email varchar [unique]\n}';
     }
 
-    if (currentLocale === 'ky') {
+    if (currentLocale === 'kg') {
       return 'Table koldonuuchular {\n  id int [pk]\n  name varchar\n  email varchar [unique]\n}';
     }
 
@@ -1066,12 +1066,12 @@
   function getWindowTitle(mode) {
     if (mode === 'er') {
       if (currentLocale === 'en') return 'ER Diagram — Local editor';
-      if (currentLocale === 'ky') return 'ER Diagram — Жергиликтүү редактор';
+      if (currentLocale === 'kg') return 'ER Diagram — Жергиликтүү редактор';
       return 'ER Diagram — Локальный редактор';
     }
 
     if (currentLocale === 'en') return 'BPMN Modeler — Local editor';
-    if (currentLocale === 'ky') return 'BPMN Modeler — Жергиликтүү редактор';
+    if (currentLocale === 'kg') return 'BPMN Modeler — Жергиликтүү редактор';
     return 'BPMN Modeler — Локальный редактор';
   }
 
@@ -1171,7 +1171,7 @@
       };
     }
 
-    if (currentLocale === 'ky') {
+    if (currentLocale === 'kg') {
       return {
         start: 'Башталыш',
         task: 'Тапшырма 1',

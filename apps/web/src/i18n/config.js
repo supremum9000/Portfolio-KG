@@ -1,4 +1,4 @@
-export const SUPPORTED_LOCALES = ['en', 'ru', 'ky'];
+export const SUPPORTED_LOCALES = ['en', 'ru', 'kg'];
 export const DEFAULT_LOCALE = 'en';
 
 export const CONTENT_PATHS = {

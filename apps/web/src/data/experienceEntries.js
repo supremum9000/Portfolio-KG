@@ -1,6 +1,6 @@
 import { experienceEntries as experienceEntriesEn } from './experienceEntries.en.js';
 import { experienceEntries as experienceEntriesRu } from './experienceEntries.ru.js';
-import { experienceEntries as experienceEntriesKy } from './experienceEntries.ky.js';
+import { experienceEntries as experienceEntriesKg } from './experienceEntries.kg.js';
 
 export const experiencePageContent = {
   en: {
@@ -17,7 +17,7 @@ export const experiencePageContent = {
     title: 'Опыт работы',
     description: 'Полная хронология мест работы по резюме.'
   },
-  ky: {
+  kg: {
     metaTitle: 'Иш тажрыйбасы - Vladimir Belov',
     metaDescription:
       'Vladimir Belovдун резюме боюнча иш тажрыйбасы: кызматтар, компаниялар, багыттар жана негизги натыйжалар.',
@@ -29,5 +29,5 @@ export const experiencePageContent = {
 export const experienceEntries = {
   en: experienceEntriesEn,
   ru: experienceEntriesRu,
-  ky: experienceEntriesKy
+  kg: experienceEntriesKg
 };

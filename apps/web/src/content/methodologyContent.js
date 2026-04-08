@@ -329,7 +329,7 @@ export const methodologyContent = {
       }
     ]
   },
-  ky: {
+  kg: {
     metaTitle: 'Методология - Vladimir Belov',
     metaDescription:
       'Vladimir Belovдун бизнес талдоо, процесстерди башкаруу, талаптарды байкоо жана тобокелдиктерди башкаруу боюнча ички курстары жана компетенцияларды өнүктүрүү ыкмасы.',

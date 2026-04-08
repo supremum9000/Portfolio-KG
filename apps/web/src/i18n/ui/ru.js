@@ -16,7 +16,7 @@ export default {
   locales: {
     en: 'EN',
     ru: 'RU',
-    ky: 'KG'
+    kg: 'KG'
   },
   footer: {
     rightsReserved: 'Все права защищены.',
