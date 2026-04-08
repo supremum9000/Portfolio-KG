@@ -1,5 +1,5 @@
 import React from 'react';
-import { Github, Linkedin, Mail, Send } from 'lucide-react';
+import { Github, Mail, Send } from 'lucide-react';
 import { useLocale } from '@/i18n/LocaleContext';
 
 function Footer() {
@@ -30,14 +30,7 @@ function Footer() {
             >
               <Send className="h-5 w-5" />
             </a>
-            <a
-              href="#"
-              className="text-muted-foreground transition-colors duration-200 hover:text-primary"
-              aria-label={ui.footer.linkedin}
-            >
-              <Linkedin className="h-5 w-5" />
-            </a>
-            <a
+<a
               href="#"
               className="text-muted-foreground transition-colors duration-200 hover:text-primary"
               aria-label={ui.footer.github}
