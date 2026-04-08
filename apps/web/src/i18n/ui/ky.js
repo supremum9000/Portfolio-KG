@@ -16,7 +16,7 @@ export default {
   locales: {
     en: 'EN',
     ru: 'RU',
-    ky: 'KY'
+    ky: 'KG'
   },
   footer: {
     rightsReserved: 'Бардык укуктар корголгон.',
